@@ -1,11 +1,10 @@
 package com.employementmanagementsystem.mvc.controller;
 
-import com.employementmanagementsystem.mvc.dto.*;
-import com.employementmanagementsystem.mvc.dto.weather.CurrentWeatherDto;
-import com.employementmanagementsystem.mvc.service.CommonService;
-import com.employementmanagementsystem.mvc.service.DepartmentService;
-import com.employementmanagementsystem.mvc.service.EmployeeService;
-import com.employementmanagementsystem.mvc.service.WeatherService;
+
+import com.employementmanagementsystem.mvc.dto.RegistDto;
+import com.employementmanagementsystem.mvc.dto.UserDto;
+import com.employementmanagementsystem.mvc.service.RegistrationService;
+import com.employementmanagementsystem.mvc.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -20,54 +19,30 @@ import java.util.List;
 @RequestMapping("/")
 public class CommonController {
     @Autowired
-    CommonService commonService;
+    UserService userService;
     @Autowired
-    EmployeeService employeeService;
-    @Autowired
-    DepartmentService departmentService;
-    @Autowired
-    WeatherService weatherService;
-    String location ="thimphu";
+    RegistrationService registrationService;
+
 	@RequestMapping(method = {RequestMethod.GET, RequestMethod.HEAD})
 	public String printWelcome() {
 		return "login";
 	}
 
-    @RequestMapping(value = "/validate",method = {RequestMethod.POST,RequestMethod.GET})
-    public String home(@RequestParam ("userId") String userId, @RequestParam ("password") String password, HttpServletRequest request){
-//        System.out.println(userId);
-//        System.out.println(password);
-        UserDto userDto = new UserDto();
-        String actionForward="";
-        String user="";
-        try{
-            ApiDto apiDto = new ApiDto();
-            userDto.setUserId(userId);
-            userDto.setPassword(password);
-            String role = commonService.validateUser(userDto);
-            apiDto = weatherService.getCurrentWeatherCondition(location);
-            Integer employeeCount = employeeService.getCount();
-            request.setAttribute("employeeCount", employeeCount);
-            request.setAttribute("weather",apiDto);
-            actionForward = (role.equalsIgnoreCase("Invalid User"))?"redirect:/":"home";
-        }
-        catch (Exception ex){
-            System.out.print(ex);
-        }
-        return actionForward;
+    @RequestMapping(value = "/login", method = RequestMethod.GET)
+    public String login(UserDto userDto){
+//        System.out.println(userDto.getUserId());
+//        System.out.println(userDto.getPassword());
+//        String userId = userDto.getUserId();
+//        String password = userDto.getPassword();
+        String userType = userService.getUserDetail(userDto);
+        String page = userType.equalsIgnoreCase("Valid")?"home":"404page";
+        return page;
     }
-    @RequestMapping(value = "/loadPage", method = RequestMethod.GET)
-    public String loadPage(@RequestParam ("page") String page, EmployeeDto employeeDto, ModelMap map, HttpServletRequest request){
-        if(page.equalsIgnoreCase("employee")){
-            List<EmployeeDto> EmployeeList = employeeService.getEmployeeList(employeeDto);
-            map.addAttribute("EmployeeList", (EmployeeList.isEmpty()?"emptyList":EmployeeList));
+    @RequestMapping(value = "/registration", method = RequestMethod.GET)
+    public String registration(RegistDto registDto) {
+        String registrationType = registrationService.getRegistration(registDto);
+        String page = registrationType.equalsIgnoreCase("Valid") ? "employee" : "404page";
+        return page;
+    }
 
-        }
-        else if(page.equalsIgnoreCase("addNewEmployee")){
-            DepartmentDto departmentDto = new DepartmentDto();
-            List<DepartmentDto> departmentList = departmentService.getDepartmentList(departmentDto);
-            request.setAttribute("departmentList", departmentList);
-        }
-        return "/"+page;
-    }
 }

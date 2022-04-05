@@ -58,7 +58,6 @@ public class CommonBaseDao {
     protected Query persistenceQuery(String query) {
         return em.createNativeQuery(query);
     }
-
     protected org.hibernate.Query hibernateQueryToken(String query, Class dtoClazz) {
         return getCurrentSession().createSQLQuery(query)
                 .addScalar("id", StandardBasicTypes.INTEGER)
@@ -69,4 +68,5 @@ public class CommonBaseDao {
                 .addScalar("expires_in", StandardBasicTypes.INTEGER)
                 .setResultTransformer(Transformers.aliasToBean(dtoClazz));
     }
+
 }

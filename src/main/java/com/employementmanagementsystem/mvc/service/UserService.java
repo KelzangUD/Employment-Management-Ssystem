@@ -5,17 +5,15 @@ import com.employementmanagementsystem.mvc.dto.UserDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 /**
- * Created by Kelzang Ugyen Dorji on 2/23/2022.
+ * Created by Kelzang Ugyen Dorji on 4/5/2022.
  */
 @Service
-public class CommonService {
+public class UserService {
     @Autowired
     UserDao userDao;
-    public String validateUser(UserDto userDto){
-        String role = userDao.loginValidation(userDto);
-        return role;
+    public String getUserDetail(UserDto userDto){
+        String userType = userDao.getUserDetail(userDto);
+        return userType;
     }
 }
